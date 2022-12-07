@@ -1,0 +1,1 @@
+Update(ctx context.Context, session sqlx.Session, newData *{{.upperStartCamelObject}}) error
