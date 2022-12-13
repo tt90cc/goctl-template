@@ -8,10 +8,12 @@ func (m *default{{.upperStartCamelObject}}Model) Insert(ctx context.Context, ses
     }
 		return conn.ExecCtx(ctx, query, {{.expressionValues}})
 	}, {{.keyValues}}){{else}}query := fmt.Sprintf("insert into %s (%s) values ({{.expression}})", m.table, {{.lowerStartCamelObject}}RowsExpectAutoSet)
-    s := m.conn
+    var err error
+    var ret sql.Result
     if session != nil {
-      s = session
-    }
-    ret,err:=s.ExecCtx(ctx, query, {{.expressionValues}}){{end}}
+        ret, err = session.ExecCtx(ctx, query, {{.expressionValues}})
+    } else {
+        ret, err = m.conn.ExecCtx(ctx, query, {{.expressionValues}})
+    }{{end}}
 	return ret,err
 }

@@ -13,10 +13,11 @@ func (m *default{{.upperStartCamelObject}}Model) Delete(ctx context.Context, ses
     }
 		return conn.ExecCtx(ctx, query, {{.lowerStartCamelPrimaryKey}})
 	}, {{.keyValues}}){{else}}query := fmt.Sprintf("delete from %s where {{.originalPrimaryKey}} = {{if .postgreSql}}$1{{else}}?{{end}}", m.table)
-    s := m.conn
+    var err error
     if session != nil {
-      s = session
-    }
-		_,err:=s.ExecCtx(ctx, query, {{.lowerStartCamelPrimaryKey}}){{end}}
+        _, err = session.ExecCtx(ctx, query, {{.lowerStartCamelPrimaryKey}})
+    } else {
+        _, err = m.conn.ExecCtx(ctx, query, {{.lowerStartCamelPrimaryKey}})
+    }{{end}}
 	return err
 }

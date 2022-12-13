@@ -13,10 +13,11 @@ func (m *default{{.upperStartCamelObject}}Model) Update(ctx context.Context, ses
     }
 		return conn.ExecCtx(ctx, query, {{.expressionValues}})
 	}, {{.keyValues}}){{else}}query := fmt.Sprintf("update %s set %s where {{.originalPrimaryKey}} = {{if .postgreSql}}$1{{else}}?{{end}}", m.table, {{.lowerStartCamelObject}}RowsWithPlaceHolder)
-    s := m.conn
+    var err error
     if session != nil {
-      s = session
-    }
-    _,err:=s.ExecCtx(ctx, query, {{.expressionValues}}){{end}}
+        _, err = session.ExecCtx(ctx, query, {{.expressionValues}})
+    } else {
+        _, err = m.conn.ExecCtx(ctx, query, {{.expressionValues}})
+    }{{end}}
 	return err
 }

@@ -46,7 +46,7 @@ func New{{.upperStartCamelObject}}Model(conn sqlx.SqlConn{{if .withCache}}, c ca
 }
 
 func (c *custom{{.upperStartCamelObject}}Model) Trans(ctx context.Context, fn func(ctx context.Context, session sqlx.Session) error) error {
-	return c.TransactCtx(ctx, func(ctx context.Context, session sqlx.Session) error {
+	return {{if .withCache}}c.TransactCtx{{else}}c.conn.TransactCtx{{end}}(ctx, func(ctx context.Context, session sqlx.Session) error {
 		return fn(ctx, session)
 	})
 }
@@ -74,7 +74,7 @@ func (c *custom{{.upperStartCamelObject}}Model) FindOneByQuery(ctx context.Conte
 	}
 
 	var resp {{.upperStartCamelObject}}
-	err = c.QueryRowNoCacheCtx(ctx, &resp, query, values...)
+	err = {{if .withCache}}c.QueryRowNoCacheCtx{{else}}c.conn.QueryRowCtx{{end}}(ctx, &resp, query, values...)
 	switch err {
 	case nil:
 		return &resp, nil
@@ -91,7 +91,7 @@ func (c *custom{{.upperStartCamelObject}}Model) FindSum(ctx context.Context, sum
 	}
 
 	var resp float64
-	err = c.QueryRowNoCacheCtx(ctx, &resp, query, values...)
+	err = {{if .withCache}}c.QueryRowNoCacheCtx{{else}}c.conn.QueryRowCtx{{end}}(ctx, &resp, query, values...)
 	switch err {
 	case nil:
 		return resp, nil
@@ -108,7 +108,7 @@ func (c *custom{{.upperStartCamelObject}}Model) FindCount(ctx context.Context, c
 	}
 
 	var resp int64
-	err = c.QueryRowNoCacheCtx(ctx, &resp, query, values...)
+	err = {{if .withCache}}c.QueryRowNoCacheCtx{{else}}c.conn.QueryRowCtx{{end}}(ctx, &resp, query, values...)
 	switch err {
 	case nil:
 		return resp, nil
@@ -131,7 +131,7 @@ func (c *custom{{.upperStartCamelObject}}Model) FindAll(ctx context.Context, row
 	}
 
 	var resp []*{{.upperStartCamelObject}}
-	err = c.QueryRowsNoCacheCtx(ctx, &resp, query, values...)
+	err = {{if .withCache}}c.QueryRowsNoCacheCtx{{else}}c.conn.QueryRowsCtx{{end}}(ctx, &resp, query, values...)
 	switch err {
 	case nil:
 		return resp, nil
@@ -159,7 +159,7 @@ func (c *custom{{.upperStartCamelObject}}Model) FindPageListByPage(ctx context.C
 	}
 
 	var resp []*{{.upperStartCamelObject}}
-	err = c.QueryRowsNoCacheCtx(ctx, &resp, query, values...)
+	err = {{if .withCache}}c.QueryRowsNoCacheCtx{{else}}c.conn.QueryRowsCtx{{end}}(ctx, &resp, query, values...)
 	switch err {
 	case nil:
 		return resp, nil
@@ -180,7 +180,7 @@ func (c *custom{{.upperStartCamelObject}}Model) FindPageListByIdDESC(ctx context
 	}
 
 	var resp []*{{.upperStartCamelObject}}
-	err = c.QueryRowsNoCacheCtx(ctx, &resp, query, values...)
+	err = {{if .withCache}}c.QueryRowsNoCacheCtx{{else}}c.conn.QueryRowsCtx{{end}}(ctx, &resp, query, values...)
 	switch err {
 	case nil:
 		return resp, nil
@@ -202,7 +202,7 @@ func (c *custom{{.upperStartCamelObject}}Model) FindPageListByIdASC(ctx context.
 	}
 
 	var resp []*{{.upperStartCamelObject}}
-	err = c.QueryRowsNoCacheCtx(ctx, &resp, query, values...)
+	err = {{if .withCache}}c.QueryRowsNoCacheCtx{{else}}c.conn.QueryRowsCtx{{end}}(ctx, &resp, query, values...)
 	switch err {
 	case nil:
 		return resp, nil
