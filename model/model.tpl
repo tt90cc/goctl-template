@@ -24,6 +24,9 @@ type (
     RowBuilder() squirrel.SelectBuilder
 		CountBuilder(field string) squirrel.SelectBuilder
 		SumBuilder(field string) squirrel.SelectBuilder
+		InsertBuilder() squirrel.InsertBuilder
+		UpdateBuilder() squirrel.UpdateBuilder
+		DeleteBuilder() squirrel.DeleteBuilder
     FindOneByQuery(ctx context.Context, rowBuilder squirrel.SelectBuilder) (*{{.upperStartCamelObject}}, error)
 		FindSum(ctx context.Context, sumBuilder squirrel.SelectBuilder) (float64, error)
 		FindCount(ctx context.Context, countBuilder squirrel.SelectBuilder) (int64, error)
@@ -31,6 +34,9 @@ type (
 		FindPageListByPage(ctx context.Context, rowBuilder squirrel.SelectBuilder, page, pageSize int64, orderBy string) ([]*{{.upperStartCamelObject}}, error)
 		FindPageListByIdDESC(ctx context.Context, rowBuilder squirrel.SelectBuilder, preMinId, pageSize int64) ([]*{{.upperStartCamelObject}}, error)
 		FindPageListByIdASC(ctx context.Context, rowBuilder squirrel.SelectBuilder, preMaxId, pageSize int64) ([]*{{.upperStartCamelObject}}, error)
+		InsertBatch(ctx context.Context, session sqlx.Session, insertBuilder squirrel.InsertBuilder) (sql.Result, error)
+		UpdateBatch(ctx context.Context, session sqlx.Session, updateBuilder squirrel.UpdateBuilder) (sql.Result, error)
+		DeleteBatch(ctx context.Context, session sqlx.Session, deleteBuilder squirrel.DeleteBuilder) (sql.Result, error)
 	}
 
 	custom{{.upperStartCamelObject}}Model struct {
@@ -64,6 +70,18 @@ func (c *custom{{.upperStartCamelObject}}Model) CountBuilder(field string) squir
 // export logic
 func (c *custom{{.upperStartCamelObject}}Model) SumBuilder(field string) squirrel.SelectBuilder {
 	return squirrel.Select("IFNULL(SUM(" + field + "),0)").From(c.table)
+}
+
+func (c *custom{{.upperStartCamelObject}}Model) InsertBuilder() squirrel.InsertBuilder {
+	return squirrel.Insert(c.table)
+}
+
+func (c *custom{{.upperStartCamelObject}}Model) UpdateBuilder() squirrel.UpdateBuilder {
+	return squirrel.Update(c.table)
+}
+
+func (c *custom{{.upperStartCamelObject}}Model) DeleteBuilder() squirrel.DeleteBuilder {
+	return squirrel.Delete(c.table)
 }
 
 func (c *custom{{.upperStartCamelObject}}Model) FindOneByQuery(ctx context.Context, rowBuilder squirrel.SelectBuilder) (*{{.upperStartCamelObject}}, error) {
@@ -209,4 +227,52 @@ func (c *custom{{.upperStartCamelObject}}Model) FindPageListByIdASC(ctx context.
 	default:
 		return nil, err
 	}
+}
+
+func (c *custom{{.upperStartCamelObject}}Model) InsertBatch(ctx context.Context, session sqlx.Session, insertBuilder squirrel.InsertBuilder) (sql.Result, error) {
+	query, values, err := insertBuilder.ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	var ret sql.Result
+	if session != nil {
+		ret, err = session.ExecCtx(ctx, query, values...)
+	} else {
+		ret, err = c.conn.ExecCtx(ctx, query, values...)
+	}
+
+	return ret, err
+}
+
+func (c *custom{{.upperStartCamelObject}}Model) UpdateBatch(ctx context.Context, session sqlx.Session, updateBuilder squirrel.UpdateBuilder) (sql.Result, error) {
+	query, values, err := updateBuilder.ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	var ret sql.Result
+	if session != nil {
+		ret, err = session.ExecCtx(ctx, query, values...)
+	} else {
+		ret, err = c.conn.ExecCtx(ctx, query, values...)
+	}
+
+	return ret, err
+}
+
+func (c *custom{{.upperStartCamelObject}}Model) DeleteBatch(ctx context.Context, session sqlx.Session, deleteBuilder squirrel.DeleteBuilder) (sql.Result, error) {
+	query, values, err := deleteBuilder.ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	var ret sql.Result
+	if session != nil {
+		ret, err = session.ExecCtx(ctx, query, values...)
+	} else {
+		ret, err = c.conn.ExecCtx(ctx, query, values...)
+	}
+
+	return ret, err
 }
