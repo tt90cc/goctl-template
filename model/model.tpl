@@ -2,6 +2,7 @@ package {{.pkg}}
 {{if .withCache}}
 import (
   "context"
+  "database/sql"
   "github.com/Masterminds/squirrel"
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
@@ -9,6 +10,7 @@ import (
 {{else}}
 import (
   "context"
+  "database/sql"
   "github.com/Masterminds/squirrel"
   "github.com/zeromicro/go-zero/core/stores/sqlx"
 )
