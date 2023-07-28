@@ -26,6 +26,7 @@ type (
     RowBuilder() squirrel.SelectBuilder
 		CountBuilder(field string) squirrel.SelectBuilder
 		SumBuilder(field string) squirrel.SelectBuilder
+		SelectBuilder(field string) squirrel.SelectBuilder
 		InsertBuilder() squirrel.InsertBuilder
 		UpdateBuilder() squirrel.UpdateBuilder
 		DeleteBuilder() squirrel.DeleteBuilder
@@ -59,19 +60,20 @@ func (c *custom{{.upperStartCamelObject}}Model) Trans(ctx context.Context, fn fu
 	})
 }
 
-// export logic
 func (c *custom{{.upperStartCamelObject}}Model) RowBuilder() squirrel.SelectBuilder {
 	return squirrel.Select({{.lowerStartCamelObject}}Rows).From(c.table)
 }
 
-// export logic
 func (c *custom{{.upperStartCamelObject}}Model) CountBuilder(field string) squirrel.SelectBuilder {
 	return squirrel.Select("COUNT(" + field + ")").From(c.table)
 }
 
-// export logic
 func (c *custom{{.upperStartCamelObject}}Model) SumBuilder(field string) squirrel.SelectBuilder {
 	return squirrel.Select("IFNULL(SUM(" + field + "),0)").From(c.table)
+}
+
+func (c *custom{{.upperStartCamelObject}}Model) SelectBuilder(field string) squirrel.SelectBuilder {
+	return squirrel.Select(field).From(c.table)
 }
 
 func (c *custom{{.upperStartCamelObject}}Model) InsertBuilder() squirrel.InsertBuilder {

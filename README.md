@@ -1,5 +1,9 @@
 # goctl-template
 
+版本 `goctl -v`
+
+goctl version 1.3.8 darwin/amd64
+
 ### 批量新增、批量更新、批量删除使用
 
 #### 批量新增
